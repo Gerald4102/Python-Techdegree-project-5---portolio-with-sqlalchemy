@@ -1,7 +1,10 @@
+import datetime
+
 from flask import (render_template, redirect,
                    url_for, request)
+
 from model import Project, db, app
-import datetime
+
 
 @app.route('/')
 def index():
@@ -51,6 +54,7 @@ def edit(id):
         return redirect(url_for('index'))
     return render_template('edit.html', project=proj, date=date_entry)
 
+
 @app.route('/projects/<id>/delete')
 def delete(id):
     proj = Project.query.get_or_404(id)
@@ -63,9 +67,13 @@ def delete(id):
 def about():
     return render_template('about.html')
 
+
+@app.errorhandler(404)
+def not_found(error):
+    return render_template('404.html', msg=error), 404
+
+
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
     app.run(debug=True, port=8000, host='127.0.0.1')
-
-# https://cdn.pixabay.com/photo/2016/11/29/13/14/attractive-1869761_1280.jpg
