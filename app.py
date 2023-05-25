@@ -14,6 +14,7 @@ def index():
 
 @app.route('/projects/new', methods=['GET', 'POST'])
 def create():
+    projects = Project.query.all()
     if request.form:
         date = request.form['date']
         date = datetime.datetime.strptime(date, '%Y-%m')
@@ -27,19 +28,22 @@ def create():
         db.session.add(new_project)
         db.session.commit()
         return redirect(url_for('index'))
-    return render_template('projectform.html')
+    return render_template('projectform.html', projects=projects)
 
 
 @app.route('/projects/<id>')
 def detail(id):
+    projects = Project.query.all()
     proj = Project.query.get_or_404(id)
     date = datetime.datetime.strftime(proj.date, '%B %Y') 
     skills = proj.skills.split(',')
-    return render_template('detail.html', project=proj, date=date, skills=skills)
+    return render_template('detail.html', project=proj, date=date, 
+                           skills=skills, projects=projects)
 
 
 @app.route('/projects/<id>/edit', methods=['GET', 'POST'])
 def edit(id):
+    projects = Project.query.all()
     proj = Project.query.get_or_404(id)
     date_entry = datetime.datetime.strftime(proj.date, '%Y-%m')
     if request.form:
@@ -52,7 +56,8 @@ def edit(id):
         proj.link = request.form['github']
         db.session.commit()
         return redirect(url_for('index'))
-    return render_template('edit.html', project=proj, date=date_entry)
+    return render_template('edit.html', project=proj, 
+                           date=date_entry, projects=projects)
 
 
 @app.route('/projects/<id>/delete')
@@ -65,7 +70,8 @@ def delete(id):
 
 @app.route('/about')
 def about():
-    return render_template('about.html')
+    projects = Project.query.all()
+    return render_template('about.html', projects=projects)
 
 
 @app.errorhandler(404)
